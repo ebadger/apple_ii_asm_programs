@@ -26,12 +26,6 @@ HGRY        = $e2
 
 HGR1SCRN    = $2000         ; Start of hires page 1
 
-KBD         = $c000         ; key code when MSB set
-KBDSTRB     = $c010         ; clear keyboard buffer
-TXTCLR      = $c050         ; graphics mode
-TXTSET      = $c051         ; text mode
-LOWSCR      = $c054         ; page 1
-HIRES       = $c057         ; hires mode
 
 balls:
         jsr hclear
@@ -170,20 +164,20 @@ nobounce:
         dec BALL
         bpl uploop
 
-        bit KBD         ; Key pressed?
-        bmi pressed
+        lda #$00
+        sta $D2
+        jsr $C11E       ; read key async
+        lda $D2
+        bne pressed
         jmp update      ; No, update everything
 
 pressed:
-        lda KBD
-        cmp #RKEY       ; Was R pressed?
+        cmp #'r'        ; Was R pressed?
         bne quit
-        bit KBDSTRB     ; Clear the key
         jmp balls       ; Restart
 
 quit:
-        bit KBDSTRB     ; Clear the key
-        bit TXTSET      ; Switch to text mode
+        jsr $C121       ; text mode
         rts
 
 ; Draw a horizontal line
@@ -243,8 +237,7 @@ hclr1:
         dex
         bne hclr1       ; Done with all pages?
 
-        bit HIRES       ; Switch to hires mode
-        bit TXTCLR
+        jsr $C115       ; graphics mode
         rts
 
 ; Draw or erase a ball
