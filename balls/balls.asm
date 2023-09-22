@@ -2,7 +2,7 @@
 ; Advanced 6502 Assembly Programming for the Apple II, by Stephen Edwards
 ; http://www.cs.columbia.edu/~sedwards/2020-vcfw-6502/
 
-cout = $FDED                ; Define cout label (character out)
+cout = $FFE7                ; Define cout label (character out)
 
 ; Numeric constants
 
@@ -166,7 +166,7 @@ nobounce:
 
         lda #$00
         sta $D2
-        jsr $C11E       ; read key async
+        jsr $F385       ; read key async
         lda $D2
         bne pressed
         jmp update      ; No, update everything
@@ -177,7 +177,7 @@ pressed:
         jmp balls       ; Restart
 
 quit:
-        jsr $C121       ; text mode
+        bit $C051       ; text mode
         rts
 
 ; Draw a horizontal line
@@ -237,7 +237,7 @@ hclr1:
         dex
         bne hclr1       ; Done with all pages?
 
-        jsr $C115       ; graphics mode
+        bit $C050      ; graphics mode
         rts
 
 ; Draw or erase a ball
